@@ -66,6 +66,12 @@ async function run() {
         const result = await cursor.toArray()
         res.json(result)
       })
+
+      app.get('/allAppointments',async(req,res)=>{
+        const allOrders = appointmentCollection.find({})
+        const result = await allOrders.toArray()
+        res.send(result);
+      })
      
 
 
@@ -84,6 +90,20 @@ async function run() {
         const result = await appointmentCollection.deleteOne(query);
         res.json(result);
     })
+
+    app.put('/allAppointments/:id' , async(req,res)=>{
+      const id = req.params.id;
+       const updatedStatus = req.body.status;
+       const filter = { _id: ObjectId(id) };
+       console.log(updatedStatus);
+       appointmentCollection
+         .updateOne(filter, {
+           $set: { status: updatedStatus },
+         })
+         .then((result) => {
+           res.send(result);
+         });
+     });
 
      
       
