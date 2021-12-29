@@ -1,5 +1,6 @@
 const express = require('express')
 const { MongoClient } = require('mongodb');
+const ObjectId = require('mongodb').ObjectId;
 const app = express()
 const cors = require('cors')
 require('dotenv').config()
@@ -67,12 +68,22 @@ async function run() {
       })
      
 
+
       app.post('/appointments' , async (req,res) => {
         const appointment = req.body;
         const result = await appointmentCollection.insertOne(appointment)
         console.log(result);
         res.json(result);
       })
+
+      app.delete('/appointments/:id',async(req,res)=>{
+        console.log(req.params);
+        const id = req.params.id;
+        const query = {_id:ObjectId(id)};
+        console.log((query));
+        const result = await appointmentCollection.deleteOne(query);
+        res.json(result);
+    })
 
      
       
