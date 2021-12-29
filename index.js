@@ -1,16 +1,46 @@
 const express = require('express')
 const { MongoClient } = require('mongodb');
 const ObjectId = require('mongodb').ObjectId;
+// const admin = require("firebase-admin");
 const app = express()
 const cors = require('cors')
 require('dotenv').config()
 const port = process.env.PORT || 5000
+
+// firebaseAdminSdk.json
+
+
+
+// const serviceAccount = require('/firebaseAdminSdk.json');
+
+// admin.initializeApp({
+//   credential: admin.credential.cert(serviceAccount)
+// });
+
 
 app.use(cors());
 app.use(express.json())
 
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.gdsos.mongodb.net/myFirstDatabase?retryWrites=true&w=majority`;;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+// secuere admin
+
+// async function verifyToken(req, res, next) {
+//   if (req.headers?.authorization?.startsWith('Bearer ')) {
+//       const token = req.headers.authorization.split(' ')[1];
+
+//       try {
+//           const decodedUser = await admin.auth().verifyIdToken(token);
+//           req.decodedEmail = decodedUser.email;
+//       }
+//       catch {
+
+//       }
+
+//   }
+//   next();
+// }
 
 async function run() {
     try {
@@ -22,7 +52,6 @@ async function run() {
       app.post('/users' , async(req,res)=>{
         const user = req.body;
         const result = await usersCollection.insertOne(user)
-        console.log(result);
         res.json(result)
         
       })
@@ -50,7 +79,7 @@ async function run() {
 
       app.put('/users/admin' , async(req,res)=>{
         const user = req.body;
-        console.log('put' , user);
+        console.log('put' , req.headers);
         const filter = {email: user.email}
         const updateDoc = {$set:{role:'admin'}};
         const result = await usersCollection.updateOne(filter,updateDoc)
@@ -60,7 +89,7 @@ async function run() {
       app.get('/appointments' , async (req,res) =>{
         const email = req.query.email;
         const date = new Date(req.query.date).toDateString();
-        console.log(date);
+        
         const query ={email:email , date:date}
         const cursor = appointmentCollection.find(query)
         const result = await cursor.toArray()
@@ -78,12 +107,12 @@ async function run() {
       app.post('/appointments' , async (req,res) => {
         const appointment = req.body;
         const result = await appointmentCollection.insertOne(appointment)
-        console.log(result);
+       
         res.json(result);
       })
 
       app.delete('/appointments/:id',async(req,res)=>{
-        console.log(req.params);
+      
         const id = req.params.id;
         const query = {_id:ObjectId(id)};
         console.log((query));
@@ -95,7 +124,7 @@ async function run() {
       const id = req.params.id;
        const updatedStatus = req.body.status;
        const filter = { _id: ObjectId(id) };
-       console.log(updatedStatus);
+      
        appointmentCollection
          .updateOne(filter, {
            $set: { status: updatedStatus },
