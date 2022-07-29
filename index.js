@@ -5,7 +5,7 @@ const ObjectId = require('mongodb').ObjectId;
 const app = express()
 const cors = require('cors')
 require('dotenv').config()
-const port = process.env.PORT || 5000
+const port = process.env.PORT || 8000
 
 // firebaseAdminSdk.json
 
@@ -121,10 +121,10 @@ async function run() {
     })
 
     app.put('/allAppointments/:id' , async(req,res)=>{
-      const id = req.params.id;
+       const id = req.params.id;
        const updatedStatus = req.body.status;
-       const filter = { _id: ObjectId(id) };
-      
+       const filter = { _id:ObjectId(id) };
+       console.log(id);
        appointmentCollection
          .updateOne(filter, {
            $set: { status: updatedStatus },
